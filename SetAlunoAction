@@ -1,0 +1,40 @@
+package br.mackenzie.projeto.action;
+
+import com.opensymphony.xwork2.ActionSupport;
+import java.util.Map;
+import org.apache.struts2.interceptor.SessionAware;
+import br.mackenzie.projeto.control.ConexaoMySQL;
+import br.mackenzie.projeto.model.Usuario;
+public class SetAlunoAction extends ActionSupport implements SessionAware {
+    private Map session;
+    private int codUsuario;
+
+    public int getCodUsuario() {
+        return codUsuario;
+    }
+
+    public void setCodUsuario(int codUsuario) {
+        this.codUsuario = codUsuario;
+    }
+ 
+    @Override
+    
+    public String execute() {
+        System.out.println(codUsuario);
+        System.out.println(codUsuario);
+        ConexaoMySQL.setAluno(codUsuario);
+        return SUCCESS;
+    }
+  
+    @Override
+    public void validate(){
+
+    }
+
+
+
+    @Override
+    public void setSession(Map<String, Object> session) {
+        this.session = session;
+    }
+}
