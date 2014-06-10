@@ -1,0 +1,318 @@
+package br.mackenzie.projeto.control;
+
+
+import br.mackenzie.projeto.model.Local;
+import br.mackenzie.projeto.model.Usuario;
+import br.mackenzie.projeto.model.Evento;
+import br.mackenzie.projeto.model.Inscricao;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+
+
+public class ConexaoMySQL {
+
+    public static String status = "Não conectou...";
+
+    public ConexaoMySQL() {
+    }
+
+    public static java.sql.Connection getConexaoMySQL() {
+        Connection connection = null;
+
+        try {
+            String driverName = "com.mysql.jdbc.Driver";
+            Class.forName(driverName);
+            String serverName = "localhost";
+            String mydatabase = "test";
+            String url = "jdbc:mysql://" + serverName + "/" + mydatabase;
+            String username = "root";
+            String password = "administrador";
+            connection = DriverManager.getConnection(url, username, password);
+            if (connection != null) {
+                status = ("STATUS--->Conectado com sucesso!");
+            } else {
+                status = ("STATUS--->Não foi possivel realizar conexão");
+            }
+            return connection;
+        } catch (ClassNotFoundException e) {
+
+            System.out.println("O driver expecificado nao foi encontrado.");
+            return null;
+        } catch (SQLException e) {
+
+            System.out.println("Nao foi possivel conectar ao Banco de Dados.");
+            return null;
+        }
+    }
+
+    public static String statusConection() {
+        return status;
+    }
+
+    public static boolean FecharConexao() {
+        try {
+            ConexaoMySQL.getConexaoMySQL().close();
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public static java.sql.Connection ReiniciarConexao() {
+        FecharConexao();
+        return ConexaoMySQL.getConexaoMySQL();
+    }
+       
+    public static Usuario getUser(String us, String ps) {
+        Usuario x = new Usuario();
+        Connection con = getConexaoMySQL();
+        String query = "select * from `Usuarios` where nome=? and senha=?";
+        try {
+            PreparedStatement preps = con.prepareStatement(query);
+            preps.setString(1, us);
+            preps.setString(2, ps);
+            preps.execute();
+            ResultSet rs = preps.getResultSet();
+            if (rs.next()) {
+                x.setCodUsuario(rs.getString("codUsuario"));
+                x.setUsuario(rs.getString("nome"));
+                x.setSenha(rs.getString("senha"));
+                x.setEmail(rs.getString("email"));
+                x.setFuncao(rs.getString("funcao"));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        
+        return x;
+    }
+    
+    public static boolean setUser(String login, String senha, String email) {
+        Connection con = getConexaoMySQL();
+        String query = "INSERT INTO `usuarios`(`nome`, `senha`, `email`,`funcao` ) VALUES (?,?,?,?)";
+        try {
+            PreparedStatement preps = con.prepareStatement(query);
+            preps.setString(1, login);
+            preps.setString(2, senha);
+            preps.setString(3, email);
+            preps.setString(4, "Aluno");
+            preps.execute();
+            return true;
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }
+    
+    public static ArrayList<Usuario> getUsers() {
+        ArrayList<Usuario> x = new ArrayList<Usuario>();
+        
+        Connection con = getConexaoMySQL();
+        String query = "SELECT * FROM `usuarios`";
+        try {
+            PreparedStatement preps = con.prepareStatement(query);
+            preps.execute();
+            ResultSet rs = preps.getResultSet();
+            while(rs.next()) {
+                Usuario us = new Usuario();
+                us.setCodUsuario(rs.getString("codUsuario"));
+                us.setUsuario(rs.getString("nome"));
+                us.setEmail(rs.getString("email"));
+                us.setFuncao(rs.getString("funcao"));
+                x.add(us);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return x;
+    }
+    
+    public static boolean setLocal(String nome) {
+        Connection con = getConexaoMySQL();
+        String query = "INSERT INTO `Locais`(`nome`) VALUES (?)";
+        try {
+            PreparedStatement preps = con.prepareStatement(query);
+            preps.setString(1, nome);
+            preps.execute();
+            return true;
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }
+    
+    public static ArrayList<Local> getLocais() {
+        ArrayList<Local> x = new ArrayList<Local>();
+        
+        Connection con = getConexaoMySQL();
+        String query = "SELECT * FROM `locais`";
+        try {
+            PreparedStatement preps = con.prepareStatement(query);
+            preps.execute();
+            ResultSet rs = preps.getResultSet();
+            while(rs.next()) {
+                Local us = new Local();
+                us.setCodLocal(rs.getString("codLocal"));
+                us.setNome(rs.getString("nome"));
+                x.add(us);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return x;
+    }
+    
+    public static boolean setEvento(String nome, String codLocal, String codUsuario) {
+        Connection con = getConexaoMySQL();
+        String query = "INSERT INTO `eventos`(`nome` , `codLocal` , `codUsuario` ) VALUES (?,?,?)";
+        try {
+            PreparedStatement preps = con.prepareStatement(query);
+            preps.setString(1, nome);
+            preps.setString(2, codLocal);
+            preps.setString(3, codUsuario);
+            preps.execute();
+            return true;
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }
+    
+    public static boolean removeEvento(String codEvento) {
+        Connection con = getConexaoMySQL();
+        String query = "DELETE FROM `eventos` WHERE codEvento=?";
+        try {
+            PreparedStatement preps = con.prepareStatement(query);
+            preps.setString(1, codEvento);
+            preps.execute();
+            return true;
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }  
+    
+    public static ArrayList<Evento> getEventos() {
+        ArrayList<Evento> x = new ArrayList<Evento>();
+        
+        Connection con = getConexaoMySQL();
+        String query = "SELECT e.codEvento , e.nome as nomeEvento, u.nome as nomeCriador, l.nome as nomeLocal " +
+"FROM eventos e INNER JOIN usuarios u" +
+"   ON e.codUsuario = u.codUsuario JOIN locais l " +
+"   ON e.codLocal = l.codLocal";
+        try {
+            PreparedStatement preps = con.prepareStatement(query);
+            preps.execute();
+            ResultSet rs = preps.getResultSet();
+            while(rs.next()) {
+                Evento ev = new Evento();
+                ev.setCodEvento(rs.getString("codEvento"));
+                ev.setNomeEvento(rs.getString("nomeEvento"));
+                ev.setNomeLocal(rs.getString("nomeLocal"));
+                ev.setNomeUsuario(rs.getString("nomeCriador"));
+                x.add(ev);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return x;
+    }
+    
+    public static boolean getInscricao(String codEvento, String codUsuario) {
+        Inscricao x = new Inscricao();
+        Connection con = getConexaoMySQL();
+        String query = "select * from `Inscricoes` where codUsuario=? and codEvento=?";
+        try {
+            PreparedStatement preps = con.prepareStatement(query);
+            preps.setString(1, codUsuario);
+            preps.setString(2, codEvento);
+            preps.execute();
+            ResultSet rs = preps.getResultSet();
+            if (rs.next()) {
+                x.setCodUsuario(rs.getString("codUsuario"));
+                x.setCodEvento(rs.getString("codEvento"));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        
+        if (x.getCodEvento()!= null && !x.getCodEvento().equals("")){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    
+    public static boolean setInscricao(Inscricao insc) {
+        Connection con = getConexaoMySQL();
+        String query = "INSERT INTO `Inscricoes`(`codUsuario`,`codEvento`) VALUES (?,?)";
+        try {
+            PreparedStatement preps = con.prepareStatement(query);
+            preps.setString(1, insc.getCodUsuario());
+            preps.setString(2, insc.getCodEvento());
+            preps.execute();
+            return true;
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }
+    
+    public static ArrayList<Inscricao> getIncricoes(String id) {
+        ArrayList<Inscricao> x = new ArrayList<Inscricao>();
+        Connection con = getConexaoMySQL();
+        String query = "SELECT i.codInscricao, i.codEvento, i.codUsuario , e.nome as nomeEvento FROM inscricoes i INNER JOIN eventos e ON i.codEvento = e.codEvento where i.codUsuario=?";
+        try {
+            PreparedStatement preps = con.prepareStatement(query);
+            preps.setString(1, id);
+            preps.execute();
+            ResultSet rs = preps.getResultSet();
+            while(rs.next()) {
+                Inscricao us = new Inscricao();
+                us.setCodInscricao(rs.getString("codInscricao"));
+                us.setCodEvento(rs.getString("codEvento"));
+                us.setCodUsuario(rs.getString("codUsuario"));
+                us.setNomeEvento(rs.getString("nomeEvento"));
+                x.add(us);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return x;
+    }
+    
+    public static boolean setPalestrante(int id) {
+        Connection con = getConexaoMySQL();
+        String query = "UPDATE `usuarios` SET funcao=? WHERE codUsuario=?";
+        try {
+            PreparedStatement preps = con.prepareStatement(query);
+            preps.setString(1, "Palestrante");
+            preps.setInt(2, id);
+            preps.execute();
+            return true;
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }
+    
+    public static boolean setAluno(int id) {
+        Connection con = getConexaoMySQL();
+        String query = "UPDATE `usuarios` SET funcao=? WHERE codUsuario=?";
+        try {
+            PreparedStatement preps = con.prepareStatement(query);
+            preps.setString(1, "Aluno");
+            preps.setInt(2, id);
+            preps.execute();
+            return true;
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }
+}
