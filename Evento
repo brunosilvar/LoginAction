@@ -1,0 +1,49 @@
+
+
+package br.mackenzie.projeto.model;
+
+public class Evento {
+    private String codEvento;
+    private String nomeEvento;
+    private String nomeLocal;
+    private String nomeUsuario;
+
+    public Evento() {
+    }
+    
+    
+
+    public String getCodEvento() {
+        return codEvento;
+    }
+
+    public void setCodEvento(String codEvento) {
+        this.codEvento = codEvento;
+    }
+
+    public String getNomeEvento() {
+        return nomeEvento;
+    }
+
+    public void setNomeEvento(String nomeEvento) {
+        this.nomeEvento = nomeEvento;
+    }
+
+    public String getNomeLocal() {
+        return nomeLocal;
+    }
+
+    public void setNomeLocal(String nomeLocal) {
+        this.nomeLocal = nomeLocal;
+    }
+
+    public String getNomeUsuario() {
+        return nomeUsuario;
+    }
+
+    public void setNomeUsuario(String nomeUsuario) {
+        this.nomeUsuario = nomeUsuario;
+    }
+    
+    
+}
