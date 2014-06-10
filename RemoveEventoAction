@@ -1,0 +1,33 @@
+package br.mackenzie.projeto.action;
+import br.mackenzie.projeto.control.ConexaoMySQL;
+import br.mackenzie.projeto.model.Evento;
+import static com.opensymphony.xwork2.Action.SUCCESS;
+import com.opensymphony.xwork2.ActionSupport;
+import org.apache.struts2.interceptor.SessionAware;
+import java.util.Map;
+
+public class RemoveEventoAction extends ActionSupport implements SessionAware {
+    private Map session;
+    private String codEvento;
+    
+    @Override
+    public String execute() {
+        ConexaoMySQL.removeEvento(codEvento);
+        return SUCCESS;
+    }
+
+    public String getCodEvento() {
+        return codEvento;
+    }
+
+    public void setCodEvento(String codEvento) {
+        this.codEvento = codEvento;
+    }
+    
+
+    
+    @Override
+    public void setSession(Map<String, Object> session) {
+        this.session = session;
+    }
+}
